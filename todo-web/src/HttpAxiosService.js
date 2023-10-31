@@ -14,35 +14,34 @@ export class HttpAxiosService {
   async setupAxiosInstances(baseURL) {
     var token = ''
     try{
-      token = await getToken();
+      token = await getToken() || ''
+      this.axiosInstance = axios.create({
+        baseURL: baseURL,
+        withCredentials: true,
+        xsrfHeaderName: 'X-CSRFToken',
+        xsrfCookieName: 'csrftoken',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+      });
+  
+      this.axiosMuliPartInstance = axios.create({
+        baseURL: baseURL,
+        withCredentials: true,
+        xsrfHeaderName: 'X-CSRFToken',
+        xsrfCookieName: 'csrftoken',
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + token
+        }
+      });
     } catch (error){
       return Promise.reject(error)
       // console.log(error)
     }
-    
-    this.axiosInstance = axios.create({
-      baseURL: baseURL,
-      withCredentials: true,
-      xsrfHeaderName: 'X-CSRFToken',
-      xsrfCookieName: 'csrftoken',
-      headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + token
-      }
-    });
-
-    this.axiosMuliPartInstance = axios.create({
-      baseURL: baseURL,
-      withCredentials: true,
-      xsrfHeaderName: 'X-CSRFToken',
-      xsrfCookieName: 'csrftoken',
-      headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ' + token
-      }
-    });
   }
 
   get(url, params) {

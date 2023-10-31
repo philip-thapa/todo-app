@@ -10,8 +10,8 @@ import Base from "../../components/Base";
 import { storeToken } from "../../authHelper";
 import { Alert, Row } from "react-bootstrap";
 import { generateOtpService } from "../SignUp/SignUp.service";
-import '../gloalpagecss.css'
 import { emailValidator } from "../../Validators";
+import '../gloalpagecss.css'
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
@@ -36,9 +36,12 @@ const SignIn = () => {
     }, [userData])
 
     useEffect(() => {
-        if (loginResponse?.success){
+        if (loginResponse?.success) {
             storeToken(loginResponse['access'])
-            fetchUserData(userDetailsService())
+                .then((res) => fetchUserData(userDetailsService()))
+                .catch((error) => {
+                    console.error('Error storing token:', error);
+                });
         }
     }, [loginResponse])
 
@@ -102,8 +105,8 @@ const SignIn = () => {
     ))
 
     const handleChange = (e) => {
-    const value = e.target.value;
-    setOtp(value);
+        const value = e.target.value;
+        setOtp(value);
     };
       
     return (

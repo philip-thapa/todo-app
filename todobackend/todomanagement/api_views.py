@@ -49,7 +49,8 @@ class GetAllTodos(APIView):
     def get(self, request):
         try:
             filters = request.query_params
-            completed, not_completed, total = CRUDManager.get_all_todos(filters)
+            user_id = request.user.id
+            completed, not_completed, total = CRUDManager.get_all_todos(filters, user_id)
             return Response({'completed': completed, 'not_completed': not_completed,
                              'total': total}, 200)
         except TodoException as e:

@@ -23,11 +23,11 @@ const Home = () => {
       'DELETE': 'DELETE'
     } 
     const [todoData, todoError, todoLoading, fetchTodoData, setTodoError] = useAxios();
-    const [markRes, markError, markLoad, fetchMark, setMarkError] = useAxios();
-    const [updateRes, updateError, updateLoad, updateTodo, setUpdateError] = useAxios();
-    const [delRes, delError, delLoad, delTodo, setDelError] = useAxios();
+    const [markRes, markError, markLoad, fetchMark] = useAxios();
+    const [updateRes, updateError, updateLoad, updateTodo] = useAxios();
+    const [delRes, delError, delLoad, delTodo] = useAxios();
     const {searchText} = useSelector(store => store.todoReducer);
-    const [sideFilter, setSideFilter] = useState('TODAY');
+    const [sideFilter, setSideFilter] = useState('My Day');
     const [modalShow, setModalShow] = React.useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalDesc, setModalDesc] = useState('');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useAxios from '../../useAxios';
 import {generateOtpService, signUpService} from './SignUp.service'
 import Form from 'react-bootstrap/Form';
@@ -10,6 +10,7 @@ import { emailValidator } from "../../Validators";
 import { verifyEmailOtpService } from "../SignIn/SignIn.service";
 import { Row, Toast } from "react-bootstrap";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import CustomToast from "../../components/CustomToast";
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
@@ -20,14 +21,25 @@ const SignUp = () => {
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [isOtpVerified, setIsOtpVerified] = useState(false);
-    const [responseEmail, setResponseEmail] = useState('')
+    const [responseEmail, setResponseEmail] = useState('');
+    const [showToast, setShowToast] = useState(false);
     const history = useHistory();
+    const emailRef = useRef(null);
+    const firstNameRef = useRef(null);
  
     const [signUpResponse, signUpError, signUpLoading, fetchSignUp, setSignUpError] = useAxios();
-    const [otpSentResponse, otpSentError, otpSentLoading, fetchOtpSent, setOtpSentError] = useAxios();
-    const [otpVerifyResponse, otpVerifyError, otpVerifyLoading, fetchOtpVerify, setOtpVerifyError] = useAxios();
+    const [otpSentResponse, otpSentError, otpSentLoading, fetchOtpSent] = useAxios();
+    const [otpVerifyResponse, otpVerifyError, otpVerifyLoading, fetchOtpVerify] = useAxios();
 
     const errorState = [signUpError, otpSentError, otpVerifyError];
+
+    useEffect(() => {
+        if (!isOtpVerified){
+            emailRef.current.focus();
+        } else {
+            firstNameRef.current.focus();
+        }
+    }, [])
 
     useEffect(() => {
         if (otpSentResponse?.msg === 'success') {
@@ -44,7 +56,10 @@ const SignUp = () => {
 
     useEffect(() => {
         if (signUpResponse?.msg === 'success'){
-            history.push('/signin')
+            setShowToast(true)
+            setTimeout(() => {
+                history.push('/signin')
+            }, 700)
         }
     }, [signUpResponse])
 
@@ -102,6 +117,10 @@ const SignUp = () => {
         fetchOtpVerify(verifyEmailOtpService({'email': email, 'otp': otp}))
     }
 
+    const handleShowToast = () => {
+        setShowToast(false);
+    }
+
     return (
         <Base>
         <div className="container d-flex justify-content-center">
@@ -109,10 +128,13 @@ const SignUp = () => {
             { !signUpLoading &&
             <>
                 <Form onSubmit={handleSubmit} style={{width: '50%'}} className="border border-light-subtle mt-4 p-4">
-                    <h3 className="d-flex justify-content-center">Sign Up Form</h3>
+                    <div className="text-center">
+                        <h3>Sign Up</h3>
+                        <h6 className="text-secondary">Please fill all the details</h6>
+                    </div>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Form.Label>Email {isOtpVerified && emailValidator(email) && <span className="badge bg-secondary">Verified</span>}</Form.Label>
-                        <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Form.Control ref={emailRef} value={email} onChange={(e) => setEmail(e.target.value)} />
                     </Form.Group>
                     {
                         otpSent && !isOtpVerified &&
@@ -136,7 +158,7 @@ const SignUp = () => {
                     </div>}
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
                         <Form.Label>First Name</Form.Label>
-                        <Form.Control value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                        <Form.Control ref={firstNameRef} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput3">
                         <Form.Label>Last Name</Form.Label>
@@ -171,6 +193,7 @@ const SignUp = () => {
             </>
             }
         </div>
+        {showToast && <CustomToast setShowToast={handleShowToast} heading="signup success" />}
         </Base>
         
     )

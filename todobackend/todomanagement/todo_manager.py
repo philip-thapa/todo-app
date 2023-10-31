@@ -70,11 +70,12 @@ class CRUDManager:
         self.todo.delete()
 
     @staticmethod
-    def get_all_todos(filters):
+    def get_all_todos(filters, user_id):
         not_completed = []
         completed = []
         query = Q()
         search = filters.get('search', '').strip()
+        query &= Q(userid=user_id)
         if search:
             query &= Q(todo_name__icontains=search)
         day_filter = filters.get('dayFilter', Constants.my_day)

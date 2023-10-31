@@ -1,10 +1,17 @@
 export const storeToken = (token) => {
-    localStorage.setItem('token', token)
+    return new Promise((resolve, reject) => {
+        try {
+            localStorage.setItem('token', token);
+            resolve(true);
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
 export const clearToken = () => {
     if (localStorage.getItem('token')){
-        localStorage.setItem('token', '')
+        localStorage.removeItem('token')
     }
 }
 
