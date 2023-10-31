@@ -1,0 +1,1 @@
+export const DELETE_MSG = 'Are you sure you want to delete Todo ?'
