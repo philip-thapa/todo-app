@@ -13,7 +13,7 @@ export const getToken = async () => {
     if (token) {
         return token;
     } else {
-        throw new Error('Token not found in local storage');
-        // return null;
+        // throw new Error('Token not found in local storage');
+        return null;
     }
 }

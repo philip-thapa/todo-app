@@ -99,11 +99,12 @@ const SignIn = () => {
             </Alert>
           </Row>
         )
-      ))
-      const handleChange = (e) => {
-        const value = e.target.value;
-        setOtp(value);
-      };
+    ))
+
+    const handleChange = (e) => {
+    const value = e.target.value;
+    setOtp(value);
+    };
       
     return (
         <Base>
@@ -139,10 +140,6 @@ const SignIn = () => {
                     </>}
                     <div className="text-center m-4 text-primary hover-pointer text-info" onClick={loginTypeChange}>{isOtp ? 'Login with password': 'Login using OTP '}</div>
                     { renderAlerts }
-                    {
-                        loginError && 
-                        <Alert key="warning" variant="warning" onClose={() => setLoginError(null)} dismissible>{loginError}</Alert>
-                    } 
                     {(!isOtp || otpSent ) && <div className="d-grid gap-2">
                         <Button className="btn btn-primary" type="submit">Login</Button>
                     </div>}

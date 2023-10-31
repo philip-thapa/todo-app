@@ -10,11 +10,12 @@ class CustomModelBackend(ModelBackend):
         try:
             data = request.data
             is_otp = data.get('otp', False)
+            email = data.get('email')
             if not is_otp:
                 return None
-            otp = OTPHandler(dict(email=data.get('email')))
+            otp = OTPHandler(dict(email=email))
             otp.verify(data.get('otp'))
-            return self.get_user(data.get('email'))
+            return self.get_user(email)
         except User.DoesNotExist:
             return None
 

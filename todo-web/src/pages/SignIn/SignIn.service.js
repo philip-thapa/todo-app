@@ -17,3 +17,7 @@ export const signUpService = (payload_data) => {
 export const userDetailsService = (payload_data) => {
   return authService.get(Urls.GET_USER_DETAILS, payload_data);
 };
+
+export const verifyEmailOtpService = (payload_data) => {
+  return authService.post(Urls.VERIFY_OTP, payload_data);
+};

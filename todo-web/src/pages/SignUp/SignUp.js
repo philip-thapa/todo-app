@@ -6,49 +6,90 @@ import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import CustomSpinner from "../../components/Spinner";
 import Base from "../../components/Base";
+import { emailValidator } from "../../Validators";
+import { verifyEmailOtpService } from "../SignIn/SignIn.service";
+import { Row, Toast } from "react-bootstrap";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const SignUp = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
+    const [responseEmail, setResponseEmail] = useState('')
+    const history = useHistory();
  
-    const [signUpResponse, signUpError, signUpLoading, fetchSignUp, setLoginError] = useAxios();
+    const [signUpResponse, signUpError, signUpLoading, fetchSignUp, setSignUpError] = useAxios();
     const [otpSentResponse, otpSentError, otpSentLoading, fetchOtpSent, setOtpSentError] = useAxios();
+    const [otpVerifyResponse, otpVerifyError, otpVerifyLoading, fetchOtpVerify, setOtpVerifyError] = useAxios();
+
+    const errorState = [signUpError, otpSentError, otpVerifyError];
 
     useEffect(() => {
-        if (otpSentResponse?.msg == 'success') {
+        if (otpSentResponse?.msg === 'success') {
             setOtpSent(true);
         }
     }, [otpSentResponse])
+
+    useEffect(() => {
+        if(otpVerifyResponse?.msg === 'success'){
+            setIsOtpVerified(true)
+            setResponseEmail(otpVerifyResponse?.email)
+        }
+    }, [otpVerifyResponse])
+
+    useEffect(() => {
+        if (signUpResponse?.msg === 'success'){
+            history.push('/signin')
+        }
+    }, [signUpResponse])
+
     const isFormvalid = () => {
-        return username.trim() && firstName.trim() && password.trim() && confirmPassword.trim() && password.trim() == confirmPassword.trim()
+        if (!firstName.trim()){
+            setSignUpError('First Name is mandatory');
+            return false;
+        }
+        if (email !== responseEmail){
+            setSignUpError('Email is not verified')
+            return false;
+        }
+        if (password.trim() !== confirmPassword.trim()){
+            setSignUpError('Password doesnot match')
+            return false;
+        }
+        return true
     }
+
+    const renderAlerts = errorState.map((error, index) => (
+        error && (
+          <Row key={index}>
+            <Alert variant="warning" onClose={() => setSignUpError(null)} dismissible>
+              {error}
+            </Alert>
+          </Row>
+        )
+    ))
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
-            return;
-        }
-        if (password.trim() !== confirmPassword.trim()){
-            setLoginError({'message': 'Password doesnot match'})
+        if (!isFormvalid()) {
             return;
         }
         const data = {
-            email: username.trim(),
+            email: email.trim(),
             password: password.trim(),
             firstName: firstName.trim(),
-            otp: otp
         }
         fetchSignUp(signUpService(data))
     }
 
     const sendOtpHandler = () => {
-        if(isFormvalid()){
-            fetchOtpSent(generateOtpService({'email': username}))
+        if(emailValidator(email)){
+            fetchOtpSent(generateOtpService({'email': email, 'signup': true}))
         }
     }
 
@@ -57,20 +98,42 @@ const SignUp = () => {
         setOtp(value);
     };
 
+    const verifyEmailOtpHandler = () => {
+        fetchOtpVerify(verifyEmailOtpService({'email': email, 'otp': otp}))
+    }
+
     return (
         <Base>
         <div className="container d-flex justify-content-center">
-            {
-                signUpLoading || otpSentLoading && <CustomSpinner />
-            }
+            
             { !signUpLoading &&
             <>
                 <Form onSubmit={handleSubmit} style={{width: '50%'}} className="border border-light-subtle mt-4 p-4">
                     <h3 className="d-flex justify-content-center">Sign Up Form</h3>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <Form.Label>Email {isOtpVerified && emailValidator(email) && <span className="badge bg-secondary">Verified</span>}</Form.Label>
+                        <Form.Control value={email} onChange={(e) => setEmail(e.target.value)} />
                     </Form.Group>
+                    {
+                        otpSent && !isOtpVerified &&
+                        <>
+                            <input
+                            type="text"
+                            className="form-control mt-2"
+                            value={otp}
+                            onChange={handleChange}
+                            maxLength="6"
+                            /> 
+                            <small className="text-muted">Enter the 6-digit OTP sent to your email</small>
+                        </>
+                    }
+                    {
+                        (otpSentLoading || otpVerifyLoading) && <CustomSpinner />
+                    }
+                    {emailValidator(email) && !isOtpVerified && <div className=" d-flex justify-content-left">
+                        <Button onClick={sendOtpHandler} className="btn btn-primary btn-sm" style={{marginTop: '4px', marginBottom:'4xp'}}>Send OTP {otpSent ? 'Again': ''}</Button>
+                        { otpSent && otp.length == 6 && !isOtpVerified && <Button onClick={verifyEmailOtpHandler} className="btn btn-success btn-sm ml-3" style={{marginTop: '4px', marginBottom:'4xp'}}>Verify</Button>}
+                    </div>}
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
                         <Form.Label>First Name</Form.Label>
                         <Form.Control value={firstName} onChange={(e) => setFirstName(e.target.value)} />
@@ -87,26 +150,18 @@ const SignUp = () => {
                         <Form.Label>Confirm Password</Form.Label>
                         <Form.Control type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                     </Form.Group>
-                    {otpSent && 
-                    <>
-                     <input
-                     type="text"
-                     className="form-control mt-2"
-                     value={otp}
-                     onChange={handleChange}
-                     maxLength="6"
-                    /> 
-                 <small className="text-muted">Enter the 6-digit OTP sent to your email</small></>}
-                    {<div className=" d-flex justify-content-left">
-                        <Button onClick={sendOtpHandler} className="btn btn-primary btn-sm" style={{marginTop: '4px', marginBottom:'4xp'}}>Send OTP {otpSent ? 'Again': ''}</Button>
-                    </div>}
+                    
+                    { renderAlerts }
+
                     {
-                        signUpError && 
-                        <Alert key="warning" variant="warning" onClose={() => setLoginError(null)} dismissible>{signUpError}</Alert>
-                    } 
+                        signUpResponse?.msg === 'success' && 
+                        <Row>
+                            <Toast title="sign up success"  />
+                        </Row>
+                    }
+
                     {
-                        otpSentError && 
-                        <Alert key="warning" variant="warning" onClose={() => setOtpSentError(null)} dismissible>{otpSentError}</Alert>
+                        signUpLoading && <CustomSpinner />
                     }
                     <div className=" d-flex justify-content-center">
                         <Button type="submit" variant="outline-primary">Sign Up</Button>

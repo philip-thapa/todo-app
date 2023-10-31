@@ -7,10 +7,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from usermanagement.constants import UserConstants
-from usermanagement.jwt_manager import JwtManager
+from usermanagement.constants import UserConstants, AuthenticationException
 from usermanagement.models import CustomUser
 from usermanagement.user_manager import SignUpManager
+from usermanagement.user_query_handler import UserQueryHandler
 from utils.constants import UserException
 from utils.mail_handler import MailHandler
 from utils.otphandler import OTPHandler
@@ -24,14 +24,17 @@ class GenerateOtp(APIView):
         try:
             data = request.data
             email = data.get('email')
-            if data.get('signin'):
-                try:
-                    CustomUser.objects.get(email=email)
-                except Exception as e:
-                    raise Exception('User doesnot exist')
+            is_signup = data.get('signup')
+            if is_signup and UserQueryHandler.is_user_exists(email):
+                raise UserException('Email already exists')
+            elif not is_signup and not UserQueryHandler.is_user_exists(email):
+                raise UserException('User doesnot exist')
             otp = OTPHandler(dict(email=email))
             code = otp.generate_otp()
-            msg = render_to_string('activation_email.html', {'otp': code})
+            if is_signup:
+                msg = render_to_string('activation_email.html', {'otp': code})
+            else:
+                msg = render_to_string('sign_in_email.html', {'otp': code})
             MailHandler.custom_send_mail(UserConstants.mail_subject, msg, data.get('email'))
             return Response({'msg': 'success'}, 200)
         except UserException as e:
@@ -46,9 +49,11 @@ class VerifyOTP(APIView):
 
     def post(self, request):
         try:
-            otp = request.data.get('otp')
-            response = OTPHandler.verify(otp)
-            return Response({'success': response}, 200)
+            data = request.data
+            email = data.get('email')
+            otp = OTPHandler(dict(email=email))
+            otp.verify(data.get('otp'))
+            return Response({'msg': 'success', 'email': email}, 200)
         except UserException as e:
             return Response(str(e), 400)
         except Exception as e:
@@ -62,10 +67,8 @@ class SignUp(APIView):
     def post(self, request):
         try:
             data = request.data
-            otp = OTPHandler(dict(email=data.get('email')))
-            otp.verify(data.get('otp'))
             SignUpManager(data).signup()
-            return Response({'success': True}, 200)
+            return Response({'msg': 'success'}, 200)
         except UserException as e:
             return Response(str(e), 400)
         except Exception as e:
@@ -80,10 +83,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        data = super().validate(attrs)
-        # data["user"] = model_to_dict(self.user, exclude=['password'])
-        data["success"] = True
-        return data
+        try:
+            data = super().validate(attrs)
+            data["success"] = True
+            return data
+        except Exception as e:
+            raise AuthenticationException('Invalid email or password')
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -96,10 +101,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
             if is_otp:
                 request.data['password'] = is_otp
             response = super(MyTokenObtainPairView, self).post(request, *args, **kwargs)
-            # if not is_otp:
-            #     response = super(MyTokenObtainPairView, self).post(request,  *args, **kwargs)
-            # else:
-            #     response = JwtManager.generate_jwt_token(data.get('email'))
             return response
         except Exception as e:
             return Response(str(e), 401)
