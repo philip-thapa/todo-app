@@ -70,3 +70,16 @@ class MarkTodo(APIView):
             return Response(str(e), 400)
         except Exception as e:
             return Response(str(e), 500)
+
+
+class AddMyDay(APIView):
+
+    def get(self, request):
+        try:
+            filters = request.query_params
+            CRUDManager(filters.get('todoId')).add_my_day(request.user)
+            return Response({'success': True}, 200)
+        except TodoException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500)

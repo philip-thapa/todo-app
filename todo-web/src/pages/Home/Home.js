@@ -15,6 +15,7 @@ import SideBar from '../../components/SideBar';
 import PopUpModal from '../../components/PopUpModal';
 import { DELETE_MSG } from '../../const/Messages';
 import RightPanel from '../../components/RightPanel';
+import '../globalpagecss.css'
 
 
 const Home = () => {
@@ -137,7 +138,7 @@ const Home = () => {
           {
               todoData && todoData?.not_completed && todoData.not_completed.map((todo)=>(
                   <Card key={todo.id} className='mb-1' onClick={() => showTodoDetails(todo)}>
-                      <Card.Body>
+                      <Card.Body className={`${todo?.my_day ? 'p-b-0' : ''}`}>
                         <Row>
                           <Col xs='auto'>
                             <Form.Check style={{display: 'inline', marginLeft: '5px', marginLeft: '10px'}} aria-label="option 1" onChange={(e) => handleCheck(e, todo.id, 'COMPLETED')} />
@@ -149,6 +150,9 @@ const Home = () => {
                               <FontAwesomeIcon icon={todo?.is_important ? solidFaStar : regFaStar } onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
                           </Col>
                         </Row>
+                        { todo?.my_day && <Row>
+                          <p className="fw-lighter" style={{fontSize: '14px', padding: '0', margin: '0'}}>My day</p>
+                        </Row>}
                       </Card.Body>
                   </Card>
               ))
@@ -166,7 +170,7 @@ const Home = () => {
                             <Form.Check checked style={{display: 'inline', marginRight: '5px', marginLeft: '10px'}} aria-label="option 1" onChange={(e) => handleCheck(e, todo.id, 'NOT_COMPLETED')} />
                           </Col>
                           <Col xs='10' style={{paddingLeft: '0'}}>
-                            <div>{todo.todo_name}</div>
+                            <div><p className='text-decoration-line-through'>{todo.todo_name}</p></div>
                           </Col>
                           <Col xs='1'>
                               <FontAwesomeIcon icon={todo?.is_important ? solidFaStar : regFaStar } onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />

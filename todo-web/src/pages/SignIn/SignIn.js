@@ -11,7 +11,7 @@ import { storeToken } from "../../authHelper";
 import { Alert, Row } from "react-bootstrap";
 import { generateOtpService } from "../SignUp/SignUp.service";
 import { emailValidator } from "../../Validators";
-import '../gloalpagecss.css'
+import '../globalpagecss.css'
 
 const SignIn = () => {
     const [email, setEmail] = useState('');

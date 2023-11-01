@@ -1,3 +1,7 @@
 .hover-pointer {
     cursor: pointer;
 }
+
+.p-b-0 {
+    padding-bottom: 0;
+}

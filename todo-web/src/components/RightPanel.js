@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faTrash, faStar as solidFaStar } from '@fortawesome/free-solid-svg-icons';
 import { faFile, faSun, faStar as regFaStar } from '@fortawesome/free-regular-svg-icons';
 import './RightPanel.css'
-import { updateTodoService } from '../pages/Home/Home.service';
+import { addMydayService, updateTodoService } from '../pages/Home/Home.service';
 import useAxios from '../useAxios';
 import CustomSpinner from './Spinner';
 
@@ -16,12 +16,14 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
 
     const [note, setNote] = useState('');
     const [updateRes, updateError, updateLoad, updateTodo, setUpdateError] = useAxios();
+    const [addMyDayRes, addMyDayError, addMydayLoad, fetchAddMyDay, setAddMyDayError] = useAxios();
+    const errorState = [updateError, addMyDayError];
 
     useEffect(() => {
-       if (updateRes?.success){
+       if (updateRes?.success || addMyDayRes?.msg == 'success'){
         handleReload(true)
        }
-    }, [updateRes])
+    }, [updateRes, addMyDayRes])
 
     useEffect(() => {
         if(todo?.note){
@@ -47,10 +49,24 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
         setNote('')
     }
 
+    const addToMyDayHandler = () => {
+        fetchAddMyDay(addMydayService({todoId: todo.id}))
+    }
+
+    const renderAlerts = errorState.map((error, index) => (
+        error && (
+          <Row key={index}>
+            <Alert variant="warning" onClose={() => setUpdateError(null)} dismissible>
+              {error}
+            </Alert>
+          </Row>
+        )
+      ))
+
     return (
         <div>
-            {updateLoad && <Row><CustomSpinner /></Row>}
-            {updateError && <Row><Alert key="warning" variant="warning" onClose={() => setUpdateError(null)} dismissible>{updateError}</Alert></Row>}
+            {(updateLoad || addMydayLoad) && <Row><CustomSpinner /></Row>}
+            {renderAlerts}
             <Row className='bgc'>
                 <Col xs={1} style={{marginLeft: '20px'}}>
                     {<Form.Check checked={todo.completed} aria-label="option 1" 
@@ -64,7 +80,7 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
                     onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
                 </Col>
             </Row>
-            <Row className='bgc'>
+            <Row className='bgc' onClick={addToMyDayHandler}>
                 <Col xs={1}>
                     <FontAwesomeIcon icon={faSun} />
                 </Col>

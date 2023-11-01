@@ -88,10 +88,11 @@ class CRUDManager:
             query &= Q(is_important=True)
         elif day_filter == Constants.Planned:
             query &= Q(todo_date__gt=DateTime.get_current_date())
-
         all_todos = Todos.objects.filter(query).order_by('-createdAt')
         serializerd_data = TodoSerializer(all_todos, many=True)
         for todo in serializerd_data.data:
+            todo['my_day'] = True if (DateTime.parse_sql_date(todo.get('todo_date')) == DateTime.get_current_date()
+                                      and day_filter != Constants.my_day) else False
             if todo.get('completed'):
                 completed.append(todo)
             else:
@@ -109,3 +110,13 @@ class CRUDManager:
             self.todo.completed = False
         self.todo.save()
 
+    def add_my_day(self, user):
+        todo = Todos()
+        todo.todo_name = self.todo.todo_name
+        todo.desc = self.todo.desc
+        todo.userid = user
+        todo.todo_date = DateTime.get_current_date()
+        try:
+            todo.save()
+        except Exception as e:
+            raise TodoException('Todo already exists for today')

@@ -29,3 +29,7 @@ export const delTodoService = (filters) => {
   return todoService.get(Urls.DELETE_TODO, filters);
 };
 
+export const addMydayService = (filters) => {
+  return todoService.get(Urls.ADD_MY_DAY, filters);
+};
+
