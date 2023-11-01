@@ -23,10 +23,15 @@ const useAxios = () => {
             });
             setResponse(res.data);
         } catch (err) {
-            if (err.response){
-                setError(err.response.data)
+            if (err?.response && err?.response?.data && err?.response?.data?.code){
+                setError('something went wrong')
+            }
+            else if(err?.response && err?.response?.data){
+                setError(err?.response?.data)
+            } else if (err?.message){
+                setError(err.message)
             } else {
-                setError(err.message);
+                setError('something went wrong')
             }
         } finally {
             setLoading(false);

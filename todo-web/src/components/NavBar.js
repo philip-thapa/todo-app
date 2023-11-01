@@ -18,12 +18,14 @@ import { search } from '../redux/todoSlice';
 
 const NavBar = () => {
     const {isLoggedIn} = useSelector(store => store.authReducer);
+    const {searchText} = useSelector(store => store.todoReducer);
     const dispatch = useDispatch();
     const [signOutRes, error, loading, fetchSignOut, seterror] = useAxios();
-    const [searchText, setSearchText] = useState('');
+    const [searchTxt, setSearchTxt] = useState('');
 
     useEffect(() => {
-    }, [isLoggedIn])
+      setSearchTxt(searchText)
+    }, [isLoggedIn, searchText])
 
     useEffect(() => {
       if(signOutRes?.success){
@@ -38,7 +40,7 @@ const NavBar = () => {
 
     const searchHandler = (e) => {
       e.preventDefault();
-      dispatch(search(searchText.trim()));
+      dispatch(search(searchTxt.trim()));
     }
   return (<>
     {
@@ -55,10 +57,10 @@ const NavBar = () => {
                 placeholder="Search"
                 className="me-2"
                 aria-label="Search"
-                value={searchText}
+                value={searchTxt}
                 onChange={e => {
                   e.preventDefault();
-                  setSearchText(e.target.value)
+                  setSearchTxt(e.target.value)
                 }}
                 style={{backgroundColor: '#fff', border: 'none'}}
                 />

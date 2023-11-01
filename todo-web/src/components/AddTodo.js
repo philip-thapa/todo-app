@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Alert, Button, Form, InputGroup, Row } from 'react-bootstrap'
 import useAxios from '../useAxios';
 import { addTodoService } from '../pages/Home/Home.service';
+import CustomSpinner from './Spinner';
 
 
 function AddTodo({checkReload}) {
@@ -23,7 +24,9 @@ function AddTodo({checkReload}) {
     addFetch(addTodoService(data))
   }
   return (
-    <Form onSubmit={addTodo} style={{marginTop: '30px'}}>
+    <>
+    {(addLoading) && <Row><CustomSpinner /></Row>}
+    {!addLoading && <Form onSubmit={addTodo} style={{marginTop: '30px'}}>
       <InputGroup className="mb-3">
         <Form.Control
           placeholder="Add a Task"
@@ -34,8 +37,14 @@ function AddTodo({checkReload}) {
         <Button type='submit' variant="outline-secondary" id="button-addon2" onClick={addTodo}>
           Add
         </Button>
-    </InputGroup>
-    </Form>
+      </InputGroup>
+      {addError && <Row style={{margin: '10px'}}>
+        <Alert variant="warning" onClose={() => setAddError(null)} dismissible>
+          {addError}
+        </Alert>
+      </Row>}
+    </Form>}
+    </>
   )
 }
 

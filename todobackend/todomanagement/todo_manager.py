@@ -58,6 +58,9 @@ class CRUDManager:
             self.todo.cateid = category
 
     def add_todo(self, payload, request):
+        if Todos.objects.filter(userid=request.user.id, todo_date=DateTime.get_current_date(),
+                             todo_name=payload.get('todoName')).exists():
+            raise Exception('Todo already exists')
         self.validate_todo_payload(payload)
         self.todo.userid = request.user
         self.todo.save()
@@ -105,5 +108,4 @@ class CRUDManager:
         elif action_type == Constants.NOT_COMPLETED:
             self.todo.completed = False
         self.todo.save()
-
 

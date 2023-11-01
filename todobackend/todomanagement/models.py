@@ -28,6 +28,7 @@ class Todos(CustomModel):
 
     class Meta:
         db_table = 'Todos'
+        unique_together = ('todo_date', 'todo_name')
 
 
 class TodoImages(CustomModel):
