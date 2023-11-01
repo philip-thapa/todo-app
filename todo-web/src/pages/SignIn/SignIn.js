@@ -38,7 +38,11 @@ const SignIn = () => {
     useEffect(() => {
         if (loginResponse?.success) {
             storeToken(loginResponse['access'])
-                .then((res) => fetchUserData(userDetailsService()))
+                .then((res) => {
+                    setTimeout(() => {
+                        fetchUserData(userDetailsService())
+                    }, 200)
+                })
                 .catch((error) => {
                     console.error('Error storing token:', error);
                 });

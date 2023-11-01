@@ -8,40 +8,36 @@ export class HttpAxiosService {
   axiosMuliPartInstance;
 
   constructor(baseURL) {
-    this.setupAxiosInstances(baseURL);
+    this.baseURL = baseURL;
+    this.createAxiosInstances();
   }
 
-  async setupAxiosInstances(baseURL) {
-    var token = ''
-    try{
-      token = await getToken() || ''
-      this.axiosInstance = axios.create({
-        baseURL: baseURL,
-        withCredentials: true,
-        xsrfHeaderName: 'X-CSRFToken',
-        xsrfCookieName: 'csrftoken',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token
-        }
-      });
-  
-      this.axiosMuliPartInstance = axios.create({
-        baseURL: baseURL,
-        withCredentials: true,
-        xsrfHeaderName: 'X-CSRFToken',
-        xsrfCookieName: 'csrftoken',
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token
-        }
-      });
-    } catch (error){
-      return Promise.reject(error)
-      // console.log(error)
-    }
+  createAxiosInstances() {
+    const token = getToken();
+
+    this.axiosInstance = axios.create({
+      baseURL: this.baseURL,
+      withCredentials: true,
+      xsrfHeaderName: 'X-CSRFToken',
+      xsrfCookieName: 'csrftoken',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
+    this.axiosMuliPartInstance = axios.create({
+      baseURL: this.baseURL,
+      withCredentials: true,
+      xsrfHeaderName: 'X-CSRFToken',
+      xsrfCookieName: 'csrftoken',
+      headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+      }
+    });
   }
 
   get(url, params) {
@@ -78,6 +74,10 @@ export class HttpAxiosService {
       url: url,
       requestConfig: data
     };
+  }
+
+  updateTokenAndInstances() {
+    this.createAxiosInstances();
   }
   
 }

@@ -15,12 +15,11 @@ export const clearToken = () => {
     }
 }
 
-export const getToken = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        return token;
+export const getToken = () => {
+    if (localStorage.getItem('token')){
+        return localStorage.getItem('token')
     } else {
-        // throw new Error('Token not found in local storage');
-        return null;
+        return ''
+
     }
 }

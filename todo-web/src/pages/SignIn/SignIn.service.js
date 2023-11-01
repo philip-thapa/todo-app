@@ -1,12 +1,11 @@
 import { Urls } from "../../const/urls";
 import { HttpAxiosService } from "../../HttpAxiosService";
 import { BASE } from "../../config/environment.config";
-import { getToken } from "../../authHelper";
 
-const authService = new HttpAxiosService(BASE, getToken());
-
+const authService = new HttpAxiosService(BASE);
 
 export const signInService = (payload_data) => {
+  authService.updateTokenAndInstances();
   return authService.post(Urls.LOGIN, payload_data);
 };
 
@@ -15,6 +14,7 @@ export const signUpService = (payload_data) => {
 };
 
 export const userDetailsService = (payload_data) => {
+  authService.updateTokenAndInstances();
   return authService.get(Urls.GET_USER_DETAILS, payload_data);
 };
 

@@ -1,11 +1,11 @@
 import { Urls } from "../../const/urls";
 import { HttpAxiosService } from "../../HttpAxiosService";
 import { BASE } from "../../config/environment.config";
-import { getToken } from "../../authHelper";
 
-const todoService = new HttpAxiosService(BASE, getToken());
+const todoService = new HttpAxiosService(BASE);
 
 export const getAllTodosService = (filters) => {
+  todoService.updateTokenAndInstances();
   return todoService.get(Urls.GET_ALL_TODOS, filters);
 };
 
