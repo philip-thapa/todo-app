@@ -25,9 +25,10 @@ class GenerateOtp(APIView):
             data = request.data
             email = data.get('email')
             is_signup = data.get('signup')
-            if is_signup and UserQueryHandler.is_user_exists(email):
+            user_exists = UserQueryHandler.is_user_exists(email)
+            if is_signup and user_exists:
                 raise UserException('Email already exists')
-            elif not is_signup and not UserQueryHandler.is_user_exists(email):
+            elif not is_signup and not user_exists:
                 raise UserException('User doesnot exist')
             otp = OTPHandler(dict(email=email))
             code = otp.generate_otp()
