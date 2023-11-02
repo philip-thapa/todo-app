@@ -31,7 +31,8 @@ class CustomUser(AbstractBaseUser):
     is_active = models.CharField(db_column='isActive', max_length=1, choices=active, default='A')
     created_at = models.DateTimeField(db_column='createdAt', default=datetime.now)
     modified_at = models.DateTimeField(db_column='modifiedAt', default=datetime.now)
-    roles = JSONField(db_column='roles', default=['endUser'])
+    roles = models.JSONField(db_column='roles', default=['endUser'])
+    # roles = JSONField(db_column='roles', default=['endUser']) django 2.2
 
     objects = CustomUserManager()
 
