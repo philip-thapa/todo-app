@@ -132,7 +132,9 @@ const SignIn = () => {
                         <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </Form.Group>}
                     {isOtp && <div className="d-grid gap-2">
-                        <button onClick={sendOtpHandler} className="btn btn-secondary" type="button">Generate OTP {otpSent ? 'Again': ''}</button>
+                        { !otpSentLoading && <button onClick={sendOtpHandler} className="btn btn-secondary" type="button">Generate OTP {otpSent ? 'Again': ''}</button>}
+                        { otpSentLoading && <button className="btn btn-secondary" type="button"><CustomSpinner /></button>}
+
                     </div>}
                     { (isOtp && otpSent) && 
                     <>
@@ -148,10 +150,11 @@ const SignIn = () => {
                     <div className="text-center m-4 text-primary hover-pointer text-info" onClick={loginTypeChange}>{isOtp ? 'Login with password': 'Login using OTP '}</div>
                     { renderAlerts }
                     {(!isOtp || otpSent ) && <div className="d-grid gap-2">
-                        <Button className="btn btn-primary" type="submit">Login</Button>
+                        {!loginLoading && <Button className="btn btn-primary" type="submit">LOGIN</Button>}
+                        {loginLoading && <Button className="btn btn-primary"><CustomSpinner /></Button>}
                     </div>}
                     {
-                        (loginLoading || otpSentLoading || userLoading) && <CustomSpinner />
+                        (userLoading) && <CustomSpinner />
                     }
                 </Form>
                 

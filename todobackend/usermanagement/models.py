@@ -29,10 +29,9 @@ class CustomUser(AbstractBaseUser):
     lastname = models.CharField(db_column='lastname', max_length=16, blank=True, null=True)
     gender = models.CharField(db_column='gender', max_length=1, blank=True, null=True, choices=gender)
     is_active = models.CharField(db_column='isActive', max_length=1, choices=active, default='A')
-    email_verified = models.BooleanField(db_column='emailVerified', default=False)
     created_at = models.DateTimeField(db_column='createdAt', default=datetime.now)
     modified_at = models.DateTimeField(db_column='modifiedAt', default=datetime.now)
-    roles = JSONField(db_column='roles', default=[])
+    roles = JSONField(db_column='roles', default=['endUser'])
 
     objects = CustomUserManager()
 

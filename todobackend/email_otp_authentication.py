@@ -14,10 +14,12 @@ class CustomModelBackend(ModelBackend):
             if not is_otp:
                 return None
             otp = OTPHandler(dict(email=email))
-            otp.verify(data.get('otp'))
-            return self.get_user(email)
+            if otp.verify(data.get('otp')):
+                return self.get_user(email)
         except User.DoesNotExist:
-            return None
+            raise Exception('User doesnot exist')
+        except Exception as e:
+            raise Exception('Invalid OTP')
 
     def get_user(self, email):
         try:

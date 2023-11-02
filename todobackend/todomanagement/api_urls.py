@@ -7,5 +7,5 @@ urlpatterns = [
     path(r'mark-todo', MarkTodo.as_view(), name='mark-todo'),
     path(r'update-todo', UpdateTodo.as_view(), name='update-todo'),
     path(r'delete-todo', DeleteTodo.as_view(), name='delete-todo'),
-    path(r'add-my-day-todo', AddMyDay.as_view(), name='delete-todo')
+    path(r'add-remove-myday-todo', AddRemoveMyDay.as_view(), name='add-remove-myday-todo')
 ]

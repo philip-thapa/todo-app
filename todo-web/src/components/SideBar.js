@@ -13,7 +13,7 @@ function SideBar({sideBarHandle, current}) {
 
   return (
     <Accordion defaultActiveKey="0">
-      <Accordion.Item eventKey="0">
+      <Accordion.Item eventKey="0" style={{border: 'none'}}>
         <Accordion.Header>Filter By</Accordion.Header>
         <Accordion.Body style={{padding: 0}}>
           {
@@ -29,7 +29,7 @@ function SideBar({sideBarHandle, current}) {
                   <Col xs={1}>
                     <FontAwesomeIcon icon={Object.values(filter)[0]} />
                   </Col>
-                  <Col>{Object.keys(filter)[0]}</Col>
+                  <Col className={`${current === Object.keys(filter)[0] ? 'fw-bold' :''}`}>{Object.keys(filter)[0]}</Col>
                 </Row>
               </div>
             ))

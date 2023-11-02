@@ -24,11 +24,11 @@ class Todos(CustomModel):
     due_date = models.DateField(db_column='dueDate', null=True, blank=True)
     completed = models.BooleanField(db_column='completed', default=False)
     note = models.TextField(db_column='note', null=True, blank=True)
-    todo_date = models.DateField(db_column='todoDate', auto_now_add=True)
+    todo_date = models.DateField(db_column='todoDate', null=True, blank=True)
 
     class Meta:
         db_table = 'Todos'
-        unique_together = ('todo_date', 'todo_name')
+        # unique_together = ('todo_date', 'todo_name')
 
 
 class TodoImages(CustomModel):

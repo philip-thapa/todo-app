@@ -32,37 +32,82 @@ const Home = () => {
     const [modalShow, setModalShow] = React.useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalDesc, setModalDesc] = useState('');
-    const [selectedTodo, setSelectedTodo] = useState({});
+    const [selectedTodo, setSelectedTodo] = useState(null);
     const [showThirdSidePanel, setShowThirdSidePanel] = useState(false);
+    const [reload, setReload] = useState(false);
     const errorState = [todoError, markError, updateError, delError];
 
     useEffect(() => {
       fetchTodoData(getAllTodosService(getFilters()));
-      setShowThirdSidePanel(false);
+      if (showThirdSidePanel){
+        setShowThirdSidePanel(false);
+      }
+    }, [sideFilter, searchText])
+    
+    useEffect(() => {
+      if (markRes?.msg == 'success' || delRes?.msg == 'success') {
+        fetchTodoData(getAllTodosService(getFilters()));
+        handleSelectedTodo()
+      }
+    }, [markRes, delRes])
+
+    useEffect(() => {
+      if(reload){
+        fetchTodoData(getAllTodosService(getFilters()));
+        setReload(false)
+      }
+    }, [reload])
+    
+
+    const handleSelectedTodo = () => {
+      if (todoData?.not_completed && selectedTodo) {
+        for (let todo of todoData.not_completed) {
+          if (todo.id === selectedTodo.id){
+            setSelectedTodo(todo)
+            return
+          }
+        }
+      }
+
+      if(todoData.completed && selectedTodo) {
+        for (let todo of todoData.completed) {
+          if (todo.id === selectedTodo.id){
+            setSelectedTodo(todo)
+            return
+          }
+        }
+      }
       setSelectedTodo(null);
-    }, [sideFilter, markRes, updateRes, delRes, searchText])
+      setShowThirdSidePanel(false);
+    }
+
+    useEffect(() => {
+      if (todoData?.not_completed && selectedTodo){
+        handleSelectedTodo();
+      }
+    }, [todoData])
+
+    const getFilters = () => {
+      return {
+        search: searchText ? searchText : '',
+        dayFilter: sideFilter ? sideFilter: 'My Day'
+      }
+    }
 
     const handleSideChange = (value) => {
         setSideFilter(value)
     }
   
-    const getFilters = () => {
-      return {
-        search: searchText ? searchText : '',
-        dayFilter: sideFilter ? sideFilter: 'TODAY'
+
+    const handleReload = (flag) => {
+      if(flag){
+        fetchTodoData(getAllTodosService(getFilters()));
+        setReload(true)
       }
     }
 
-    const getTodoData = () => {
-      fetchTodoData(getAllTodosService(getFilters()));
-    }
-
-    const handleReload = (flag) => {
-      if(flag)
-        getTodoData();
-    }
-
     const handleCheck = (e, id, type) => {
+      e.stopPropagation(); 
       let filter = {
         id,
         type,
@@ -82,11 +127,11 @@ const Home = () => {
       setModalShow(false)
       setModalTitle('');
       setModalDesc('');
-      setShowThirdSidePanel(false)
+      setReload(true);
     }
 
     const closeModal = () => {
-      setDefaultState();
+      setModalShow(false);
     };
 
     const handleModalClose = (data) => {
@@ -104,12 +149,8 @@ const Home = () => {
     }
 
     const showTodoDetails = (todo) => {
-      if(todo.id == selectedTodo?.id){
-        setShowThirdSidePanel(!showThirdSidePanel)
-      } else {
-        setShowThirdSidePanel(true)
-      }
-      setSelectedTodo(todo)
+      setSelectedTodo(() => todo)
+      setShowThirdSidePanel(true)
     }
 
   const renderAlerts = errorState.map((error, index) => (
@@ -124,30 +165,33 @@ const Home = () => {
 
   return (
     <Base>
-      <Row style={{marginTop: '10px', height: '80vh'}}>
-        <Col xs={2}>
+      <Row style={{marginTop: '10px', backgroundColor: '#FAF9F8'}}>
+        <Col xs={2} style={{backgroundColor: '#fff'}}>
           <SideBar sideBarHandle={handleSideChange} current={sideFilter} />
         </Col>
-        <Col style={{backgroundColor: '#FAF9F8'}}>
+        <Col className={`bg-FAF9F8 ${!showThirdSidePanel ? 'mr-40' : ''}`} style={{height: '90vh', overflowY: 'auto'}}>
           <HomeHeader sideFilter={sideFilter} />
-          <AddTodo checkReload={handleReload} />
+          <AddTodo checkReload={handleReload} sideFilter={sideFilter} />
           {
             renderAlerts
           }
           {(todoLoading || markLoad || updateLoad || delLoad) && <Row><CustomSpinner /></Row>}
           {
               todoData && todoData?.not_completed && todoData.not_completed.map((todo)=>(
-                  <Card key={todo.id} className='mb-1' onClick={() => showTodoDetails(todo)}>
-                      <Card.Body className={`${todo?.my_day ? 'p-b-0' : ''}`}>
+                  <Card key={todo.id} className='mb-1 hover-pointer' >
+                      <Card.Body className={`${todo?.my_day ? 'p-b-0' : '', selectedTodo && todo?.id === selectedTodo?.id ? 'active-row': ''}`} >
                         <Row>
                           <Col xs='auto'>
-                            <Form.Check style={{display: 'inline', marginLeft: '5px', marginLeft: '10px'}} aria-label="option 1" onChange={(e) => handleCheck(e, todo.id, 'COMPLETED')} />
+                            <Form.Check style={{display: 'inline', marginLeft: '5px', marginLeft: '10px'}} aria-label="option 1" 
+                              onChange={(e) => handleCheck(e, todo.id, 'COMPLETED')} />
                           </Col>
-                          <Col xs='10' style={{paddingLeft: '0'}}>
+                          <Col xs='10' style={{paddingLeft: '0'}} onClick={() => showTodoDetails(todo)}>
                             <div>{todo.todo_name}</div>
                           </Col>
                           <Col xs='1'>
-                              <FontAwesomeIcon icon={todo?.is_important ? solidFaStar : regFaStar } onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
+                              <FontAwesomeIcon title={todo?.is_important ? 'Mark Important' : 'Mark not Important'} 
+                                  icon={todo?.is_important ? solidFaStar : regFaStar } 
+                                  onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
                           </Col>
                         </Row>
                         { todo?.my_day && <Row>
@@ -163,19 +207,25 @@ const Home = () => {
               <Accordion.Body style={{padding: '0'}}>
               {
                 todoData && todoData?.completed && todoData.completed.map(todo=>(
-                  <Card key={todo.id} className='mb-1' onClick={() => showTodoDetails(todo)}>
-                      <Card.Body>
+                  <Card key={todo.id} className='mb-1 hover-pointer'>
+                      <Card.Body className={`${selectedTodo && todo?.id === selectedTodo?.id ? 'active-row': ''}`}>
                         <Row>
                           <Col xs='auto'>
-                            <Form.Check checked style={{display: 'inline', marginRight: '5px', marginLeft: '10px'}} aria-label="option 1" onChange={(e) => handleCheck(e, todo.id, 'NOT_COMPLETED')} />
+                            <Form.Check checked style={{display: 'inline', marginRight: '5px', marginLeft: '10px'}} aria-label="option 1" 
+                              onChange={(e) => handleCheck(e, todo.id, 'NOT_COMPLETED')} />
                           </Col>
-                          <Col xs='10' style={{paddingLeft: '0'}}>
-                            <div><p className='text-decoration-line-through'>{todo.todo_name}</p></div>
+                          <Col xs='10' style={{paddingLeft: '0'}} onClick={() => showTodoDetails(todo)}>
+                            <div><p className='text-decoration-line-through m-0'>{todo.todo_name}</p></div>
                           </Col>
                           <Col xs='1'>
-                              <FontAwesomeIcon icon={todo?.is_important ? solidFaStar : regFaStar } onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
+                              <FontAwesomeIcon title={todo?.is_important ? 'Mark Important' : 'Mark not Important'} 
+                                  icon={todo?.is_important ? solidFaStar : regFaStar } 
+                                  onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
                           </Col>
                         </Row>
+                        { todo?.my_day && <Row>
+                          <p className="fw-lighter" style={{fontSize: '14px', padding: '0', margin: '0'}}>My day</p>
+                        </Row>}
                       </Card.Body>
                   </Card>
               ))

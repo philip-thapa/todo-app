@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faTrash, faStar as solidFaStar } from '@fortawesome/free-solid-svg-icons';
-import { faFile, faSun, faStar as regFaStar } from '@fortawesome/free-regular-svg-icons';
+import { faCircleXmark, faFile, faSun, faStar as regFaStar } from '@fortawesome/free-regular-svg-icons';
 import './RightPanel.css'
 import { addMydayService, updateTodoService } from '../pages/Home/Home.service';
 import useAxios from '../useAxios';
@@ -49,8 +49,14 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
         setNote('')
     }
 
-    const addToMyDayHandler = () => {
-        fetchAddMyDay(addMydayService({todoId: todo.id}))
+    const addToMyDayHandler = (isAdd) => {
+        let filter = {
+            todoId: todo.id
+        }
+        if (isAdd){
+            filter['isAdd'] = true
+        }
+        fetchAddMyDay(addMydayService(filter))
     }
 
     const renderAlerts = errorState.map((error, index) => (
@@ -73,21 +79,23 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
                         onChange={(e) => handleCheck(e, todo.id, todo.completed ? 'NOT_COMPLETED' : 'COMPLETED')} />}
                 </Col>
                 <Col xs={9}>
-                    <p className='font-weight-bold'>{todo.todo_name}</p>
+                    <p className={`font-weight-bold ${todo.completed ? 'text-decoration-line-through' : ''}`}>{todo.todo_name}</p>
                 </Col>
                 <Col xs={1}>
                     <FontAwesomeIcon icon={todo?.is_important ? solidFaStar : regFaStar } 
                     onClick={(e) => handleCheck(e, todo.id, todo.is_important ? 'NOT_IMPORTANT' : 'IMPORTANT')} />
                 </Col>
             </Row>
-            <Row className='bgc' onClick={addToMyDayHandler}>
+            <Row className='bgc'>
                 <Col xs={1}>
                     <FontAwesomeIcon icon={faSun} />
                 </Col>
                 <Col xs={10}>
-                    <p className='font-weight-light'>Add to My Day</p>
+                    {!todo?.my_day && <p onClick={() => addToMyDayHandler(true)} className={`font-weight-light`}>Add to My Day</p>}
+                    {todo?.my_day && <p className='font-weight-light color-green'>Added to My Day</p>}
                 </Col>
                 <Col xs={1}>
+                    { todo?.my_day && <FontAwesomeIcon onClick={() => addToMyDayHandler(false)} title='Remove from My Day' icon={faCircleXmark} /> }
                 </Col>
             </Row>
             <Row className='bgc' onClick={() => handleClick(actions.EDIT)}>

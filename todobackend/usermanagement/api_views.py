@@ -104,6 +104,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
             response = super(MyTokenObtainPairView, self).post(request, *args, **kwargs)
             return response
         except Exception as e:
+            if request.data.get('otp'):
+                return Response('Invalid OTP', 401)
             return Response(str(e), 401)
 
 

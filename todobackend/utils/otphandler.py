@@ -25,7 +25,6 @@ class OTPHandler:
 
     def verify(self, code):
         try:
-            if not self.t_otp.verify(code):
-                raise Exception('Invalid OTP')
+            return self.t_otp.verify(code)
         except Exception as e:
             raise Exception('Invalid OTP')

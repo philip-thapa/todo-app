@@ -17,6 +17,8 @@ class Constants:
         Tasks: 'Tasks'
     }
 
+    ALL_TYPES = [my_day, Important, Planned, Tasks]
+
     IMPORTANT = 'IMPORTANT'
     NOT_IMPORTANT = 'NOT_IMPORTANT'
     COMPLETED = 'COMPLETED'

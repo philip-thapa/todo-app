@@ -37,7 +37,7 @@ class DeleteTodo(APIView):
         try:
             filters = request.query_params
             CRUDManager(filters.get('todoId')).delete_todo()
-            return Response({'success': True}, 200)
+            return Response({'msg': 'success'}, 200)
         except TodoException as e:
             return Response(str(e), 400)
         except Exception as e:
@@ -65,20 +65,21 @@ class MarkTodo(APIView):
         try:
             filters = request.query_params
             CRUDManager(filters.get('id')).markTodo(filters.get('type'))
-            return Response({'success': True}, 200)
+            return Response({'msg': 'success'}, 200)
         except TodoException as e:
             return Response(str(e), 400)
         except Exception as e:
             return Response(str(e), 500)
 
 
-class AddMyDay(APIView):
+class AddRemoveMyDay(APIView):
 
     def get(self, request):
         try:
             filters = request.query_params
-            CRUDManager(filters.get('todoId')).add_my_day(request.user)
-            return Response({'success': True}, 200)
+            is_add = filters.get('isAdd')
+            CRUDManager(filters.get('todoId')).add_or_remove_my_day(is_add)
+            return Response({'msg': 'success'}, 200)
         except TodoException as e:
             return Response(str(e), 400)
         except Exception as e:

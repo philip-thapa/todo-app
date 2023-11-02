@@ -13,6 +13,6 @@ export class Urls {
     static MARK_TODO = Urls.TODO_API_PREFIX + '/todo/mark-todo';
     static UPDATE_TODO = Urls.TODO_API_PREFIX + '/todo/update-todo';
     static DELETE_TODO = Urls.TODO_API_PREFIX + '/todo/delete-todo';
-    static ADD_MY_DAY = Urls.TODO_API_PREFIX + '/todo/add-my-day-todo';
+    static ADD_MY_DAY = Urls.TODO_API_PREFIX + '/todo/add-remove-myday-todo';
     
 }

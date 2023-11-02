@@ -1,7 +1,11 @@
 .active_section {
-    background-color: antiquewhite !important;
+    background-color: #EFF6FC !important;
 }
 
 .default_section {
     background-color: #fff !important;
+}
+
+.color-green {
+    color: #2E64CF;
 }

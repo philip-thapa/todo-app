@@ -38,8 +38,11 @@ class CRUDManager:
         if due_date:
             current_date = DateTime.get_current_date()
             if current_date > due_date:
-                raise Exception('Due date must be greater or equal to today')
+                raise TodoException('Due date must be greater or equal to today')
             self.todo.due_date = due_date
+
+        # if payload.get('todoType') not in Constants.ALL_TYPES:
+        #     raise TodoException('Invalid type')
 
         is_important = payload.get('isImportant', False)
         if is_important:
@@ -60,9 +63,13 @@ class CRUDManager:
     def add_todo(self, payload, request):
         if Todos.objects.filter(userid=request.user.id, todo_date=DateTime.get_current_date(),
                              todo_name=payload.get('todoName')).exists():
-            raise Exception('Todo already exists')
+            raise TodoException('Todo already exists')
         self.validate_todo_payload(payload)
         self.todo.userid = request.user
+        if payload.get('todoType') == Constants.my_day:
+            self.todo.todo_date = DateTime.get_current_date()
+        elif payload.get('todoType') == Constants.Important:
+            self.todo.is_important = True
         self.todo.save()
 
     def update_todo(self, payload):
@@ -91,8 +98,10 @@ class CRUDManager:
         all_todos = Todos.objects.filter(query).order_by('-createdAt')
         serializerd_data = TodoSerializer(all_todos, many=True)
         for todo in serializerd_data.data:
-            todo['my_day'] = True if (DateTime.parse_sql_date(todo.get('todo_date')) == DateTime.get_current_date()
-                                      and day_filter != Constants.my_day) else False
+            todo['my_day'] = True if (day_filter == Constants.my_day or
+                                      (todo.get('todo_date') and
+                                       DateTime.parse_sql_date(todo.get('todo_date')) == DateTime.get_current_date())) \
+                else False
             if todo.get('completed'):
                 completed.append(todo)
             else:
@@ -110,13 +119,9 @@ class CRUDManager:
             self.todo.completed = False
         self.todo.save()
 
-    def add_my_day(self, user):
-        todo = Todos()
-        todo.todo_name = self.todo.todo_name
-        todo.desc = self.todo.desc
-        todo.userid = user
-        todo.todo_date = DateTime.get_current_date()
-        try:
-            todo.save()
-        except Exception as e:
-            raise TodoException('Todo already exists for today')
+    def add_or_remove_my_day(self, is_add):
+        if not is_add:
+            self.todo.todo_date = None
+        else:
+            self.todo.todo_date = DateTime.get_current_date()
+        self.todo.save()

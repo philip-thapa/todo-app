@@ -49,14 +49,19 @@ const PopUpModal = (props) => {
                 aria-label="Recipient's username"
                 aria-describedby="basic-addon2"
                 value={todo}
-                onChange={e=> setTodo(e.target.value)} 
+                onChange={e=> setTodo(e.target.value)}
+                onKeyDown={(e) => {
+                    if(e.key === 'Enter'){
+                        handleSave()
+                    }
+                }}
             />}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave}>
+          <Button variant="primary" onClick={handleSave} className={`${title === actions.DELETE ? 'btn-danger' : ''}`}>
             {title == actions.EDIT ? 'Save Changes' : 'Delete'}
           </Button>
         </Modal.Footer>
