@@ -28,10 +28,11 @@ const SignUp = () => {
     const firstNameRef = useRef(null);
  
     const [signUpResponse, signUpError, signUpLoading, fetchSignUp, setSignUpError] = useAxios();
-    const [otpSentResponse, otpSentError, otpSentLoading, fetchOtpSent] = useAxios();
-    const [otpVerifyResponse, otpVerifyError, otpVerifyLoading, fetchOtpVerify] = useAxios();
+    const [otpSentResponse, otpSentError, otpSentLoading, fetchOtpSent, setOtpSentError] = useAxios();
+    const [otpVerifyResponse, otpVerifyError, otpVerifyLoading, fetchOtpVerify, setOtpVerifyError] = useAxios();
 
     const errorState = [signUpError, otpSentError, otpVerifyError];
+    const erroStateFunc = [setSignUpError, setOtpSentError, setOtpVerifyError];
 
     useEffect(() => {
         if (!isOtpVerified){
@@ -64,6 +65,9 @@ const SignUp = () => {
     }, [signUpResponse])
 
     const isFormvalid = () => {
+        if (!email) {
+            setSignUpError('Email is mandatory');
+        }
         if (!firstName.trim()){
             setSignUpError('First Name is mandatory');
             return false;
@@ -82,7 +86,7 @@ const SignUp = () => {
     const renderAlerts = errorState.map((error, index) => (
         error && (
           <Row key={index}>
-            <Alert variant="warning" onClose={() => setSignUpError(null)} dismissible>
+            <Alert variant="warning" onClose={() => erroStateFunc[index](null)} dismissible>
               {error}
             </Alert>
           </Row>
@@ -154,7 +158,7 @@ const SignUp = () => {
                     }
                     {emailValidator(email) && !isOtpVerified && <div className=" d-flex justify-content-left">
                         <Button onClick={sendOtpHandler} className="btn btn-primary btn-sm" style={{marginTop: '4px', marginBottom:'4xp'}}>Send OTP {otpSent ? 'Again': ''}</Button>
-                        { otpSent && otp.length == 6 && !isOtpVerified && <Button onClick={verifyEmailOtpHandler} className="btn btn-success btn-sm ml-3" style={{marginTop: '4px', marginBottom:'4xp'}}>Verify</Button>}
+                        { otpSent && otp.length === 6 && !isOtpVerified && <Button onClick={verifyEmailOtpHandler} className="btn btn-success btn-sm ml-3" style={{marginTop: '4px', marginBottom:'4xp'}}>Verify</Button>}
                     </div>}
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
                         <Form.Label>First Name</Form.Label>
@@ -181,14 +185,10 @@ const SignUp = () => {
                             <Toast title="sign up success"  />
                         </Row>
                     }
-
-                    {
-                        signUpLoading && <CustomSpinner />
-                    }
-                    <div className=" d-flex justify-content-center">
-                        <Button type="submit" variant="outline-primary">Sign Up</Button>
+                    <div className="d-grid gap-2">
+                        { !signUpLoading && <Button type="submit" variant="btn btn-primary">Sign Up</Button>}
+                        { signUpLoading && <Button type="submit" variant="btn btn-primary"> <CustomSpinner /></Button>}
                     </div>
-                    
                 </Form>
             </>
             }

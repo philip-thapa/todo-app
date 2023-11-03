@@ -48,8 +48,9 @@ const NavBar = () => {
     }
     {!loading && <Navbar bg="primary" data-bs-theme="dark">
         <Container>
-            {isLoggedIn && <Nav>
-                <Link className="nav-link" to="/home">To Do</Link>
+            {isLoggedIn && 
+            <Nav>
+                <Link className="navbar-brand text-light" to="/home">To Do</Link>
             </Nav>}
             {isLoggedIn && <Form className="d-flex" onSubmit={searchHandler}>
                 <Form.Control
@@ -72,8 +73,8 @@ const NavBar = () => {
                 Sign Out
               </NavDropdown.Item>
             </NavDropdown>}
-            {!isLoggedIn  && <Link className="nav-link" to="/signin">Sign In</Link>}
-            {!isLoggedIn && <Link className="nav-link" to="/signup">Sign Up</Link>}
+            {!isLoggedIn  && <Link className="nav-link text-light" to="/signin">Sign In</Link>}
+            {!isLoggedIn && <Link className="nav-link text-light" to="/signup">Sign Up</Link>}
           </Nav>
         </Container>
     </Navbar>}

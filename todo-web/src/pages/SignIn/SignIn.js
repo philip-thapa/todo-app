@@ -12,6 +12,7 @@ import { Alert, Row } from "react-bootstrap";
 import { generateOtpService } from "../SignUp/SignUp.service";
 import { emailValidator } from "../../Validators";
 import '../globalpagecss.css'
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
@@ -156,6 +157,10 @@ const SignIn = () => {
                     {
                         (userLoading) && <CustomSpinner />
                     }
+
+                    <div className="text-right">
+                        <Link to='/forgot-password'>Forgot password?</Link>
+                    </div>
                 </Form>
                 
             </div>

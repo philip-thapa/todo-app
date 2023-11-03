@@ -9,8 +9,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from usermanagement.constants import UserConstants, AuthenticationException
 from usermanagement.models import CustomUser
-from usermanagement.user_manager import SignUpManager
+from usermanagement.user_manager import SignUpManager, ForgotPasswordManager
 from usermanagement.user_query_handler import UserQueryHandler
+from utils.Validators import Validators
 from utils.constants import UserException
 from utils.mail_handler import MailHandler
 from utils.otphandler import OTPHandler
@@ -126,6 +127,21 @@ class GetUserDetails(APIView):
         try:
             user_details = model_to_dict(request.user, exclude=['password', 'is_active', 'modified_at', 'last_login'])
             return Response({'data': user_details}, 200)
+        except UserException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500, exception=True)
+
+
+@authentication_classes([])
+@permission_classes([])
+class ForgotPassword(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            res = ForgotPasswordManager.forgot_password(data)
+            return Response({'msg': 'success', 'success': res}, 200)
         except UserException as e:
             return Response(str(e), 400)
         except Exception as e:

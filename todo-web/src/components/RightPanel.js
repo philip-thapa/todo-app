@@ -20,7 +20,7 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
     const errorState = [updateError, addMyDayError];
 
     useEffect(() => {
-       if (updateRes?.success || addMyDayRes?.msg == 'success'){
+       if (updateRes?.success || addMyDayRes?.msg === 'success'){
         handleReload(true)
        }
     }, [updateRes, addMyDayRes])
@@ -123,7 +123,7 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
                     <FontAwesomeIcon icon={faFile} />
                 </Col>
                 <Col xs={10}>
-                    <p className='font-weight-light'>Add a file</p>
+                    <p className='font-weight-light'>Add file</p>
                 </Col>
                 <Col xs={1}>
                 </Col>
