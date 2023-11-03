@@ -8,10 +8,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from usermanagement.constants import UserConstants, AuthenticationException
-from usermanagement.models import CustomUser
 from usermanagement.user_manager import SignUpManager, ForgotPasswordManager
 from usermanagement.user_query_handler import UserQueryHandler
-from utils.Validators import Validators
 from utils.constants import UserException
 from utils.mail_handler import MailHandler
 from utils.otphandler import OTPHandler
