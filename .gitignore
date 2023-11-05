@@ -1,6 +1,1 @@
-
-*.pyc
-*.pyc
-*.pyc
-todobackend/usermanagement/__pycache__/api_views.cpython-36.pyc
-*.pyc
+__pycache__

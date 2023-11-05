@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import RedirectRoute from './RedirectRoute';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import ForgotPassword from '../../pages/ForgotPassword/ForgotPassword';
+import MyProfile from '../../pages/MyProfile/MyProfile';
 
 const Routes = () => {
   const {isLoggedIn} = useSelector(store => store.authReducer)
@@ -23,6 +24,7 @@ const Routes = () => {
         <PrivateRoute path="/home" exact component={Home} isLoggedIn={isLoggedIn} />
         <RedirectRoute path="/signup" exact component={SignUp} />
         <RedirectRoute path="/forgot-password" exact component={ForgotPassword} />
+        <PrivateRoute path="/my-profile" exact component={MyProfile} isLoggedIn={isLoggedIn} />
         <Redirect from="/" to="/signin" />
       </Switch>
     </BrowserRouter>

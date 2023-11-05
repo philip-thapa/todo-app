@@ -8,7 +8,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from usermanagement.constants import UserConstants, AuthenticationException
-from usermanagement.user_manager import SignUpManager, ForgotPasswordManager
+from usermanagement.user_manager import SignUpManager, ForgotPasswordManager, UserAccountManager, ResetPasswordManager
 from usermanagement.user_query_handler import UserQueryHandler
 from utils.constants import UserException
 from utils.mail_handler import MailHandler
@@ -140,6 +140,46 @@ class ForgotPassword(APIView):
             data = request.data
             res = ForgotPasswordManager.forgot_password(data)
             return Response({'msg': 'success', 'success': res}, 200)
+        except UserException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500, exception=True)
+
+
+class GetUserProfile(APIView):
+
+    def get(self, request):
+        try:
+            email = request.user.email
+            user_data = UserAccountManager(email).get_user_details()
+            return Response({'user': user_data}, 200)
+        except UserException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500, exception=True)
+
+
+class ResetPassword(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            email = request.user.email
+            ResetPasswordManager(email).reset_password(data)
+            return Response({'msg': 'success'}, 200)
+        except UserException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500, exception=True)
+
+
+class EditMyProfile(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            UserAccountManager(request.user.email).edit_my_profile(data)
+            return Response({'msg': 'success'}, 200)
         except UserException as e:
             return Response(str(e), 400)
         except Exception as e:

@@ -8,6 +8,9 @@ export class Urls {
     static SIGN_OUT = Urls.TODO_API_PREFIX + '/user/sign-out';
     static GET_USER_DETAILS = Urls.TODO_API_PREFIX + '/user/get-user-details';
     static FORGOT_PASSWORD = Urls.TODO_API_PREFIX + '/user/forgot-password';
+    static GET_MY_PROFILE = Urls.TODO_API_PREFIX + '/user/get-my-profile';
+    static RESET_PASSWORD = Urls.TODO_API_PREFIX + '/user/reset-password';
+    static EDIT_PROFILE = Urls.TODO_API_PREFIX + '/user/edit-my-profile';
 
     static GET_ALL_TODOS = Urls.TODO_API_PREFIX + '/todo/get-all-todos';
     static ADD_TODO = Urls.TODO_API_PREFIX + '/todo/add-todo';

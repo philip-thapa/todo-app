@@ -15,9 +15,9 @@ def default_json():
 
 class CustomUser(AbstractBaseUser):
     gender = (
-        ('M', 'M'),
-        ('F', 'F',),
-        ('N', 'N')
+        ('Male', 'Male'),
+        ('Female', 'Female',),
+        ('N/A', 'N/A')
     )
     active = (
         ('A', 'A'),
@@ -27,7 +27,7 @@ class CustomUser(AbstractBaseUser):
     phone = models.CharField(db_column='phone', max_length=10, blank=True, null=True)
     firstname = models.CharField(db_column='firstName', max_length=16, blank=False, null=False)
     lastname = models.CharField(db_column='lastname', max_length=16, blank=True, null=True)
-    gender = models.CharField(db_column='gender', max_length=1, blank=True, null=True, choices=gender)
+    gender = models.CharField(db_column='gender', max_length=10, blank=True, null=True, choices=gender)
     is_active = models.CharField(db_column='isActive', max_length=1, choices=active, default='A')
     created_at = models.DateTimeField(db_column='createdAt', default=datetime.now)
     modified_at = models.DateTimeField(db_column='modifiedAt', default=datetime.now)

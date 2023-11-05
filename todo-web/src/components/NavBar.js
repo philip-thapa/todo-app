@@ -7,7 +7,7 @@ import {
     Link
 } from "react-router-dom";
 import { logout } from '../redux/authSlice';
-import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
+import { Redirect, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 import { Button, Form, NavDropdown } from 'react-bootstrap';
 import { signOut } from '../pages/Home/Home.service';
 import useAxios from '../useAxios';
@@ -18,13 +18,19 @@ import { search } from '../redux/todoSlice';
 
 const NavBar = () => {
     const {isLoggedIn} = useSelector(store => store.authReducer);
+    const {userDetails} = useSelector(store => store.authReducer);
     const {searchText} = useSelector(store => store.todoReducer);
     const dispatch = useDispatch();
     const [signOutRes, error, loading, fetchSignOut, seterror] = useAxios();
     const [searchTxt, setSearchTxt] = useState('');
+    const [user, setUser] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
       setSearchTxt(searchText)
+      if (userDetails) {
+        setUser(JSON.parse(userDetails))
+      }
     }, [isLoggedIn, searchText])
 
     useEffect(() => {
@@ -52,7 +58,7 @@ const NavBar = () => {
             <Nav>
                 <Link className="navbar-brand text-light" to="/home">To Do</Link>
             </Nav>}
-            {isLoggedIn && <Form className="d-flex" onSubmit={searchHandler}>
+            {isLoggedIn && location.pathname === '/home' && <Form className="d-flex" onSubmit={searchHandler}>
                 <Form.Control
                 type="search"
                 placeholder="Search"
@@ -67,8 +73,11 @@ const NavBar = () => {
                 />
             </Form>}
           <Nav>
-            { isLoggedIn && <NavDropdown title={'Philip'} id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+            { isLoggedIn && <NavDropdown title={user?.firstname} id="basic-nav-dropdown">
+              <NavDropdown.Item>
+                <Link className="navbar-brand text-light"
+                   to='/my-profile'>My Profile</Link>
+              </NavDropdown.Item>
               <NavDropdown.Item onClick={handleSignout}>
                 Sign Out
               </NavDropdown.Item>

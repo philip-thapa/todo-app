@@ -1,4 +1,5 @@
 from django.db import IntegrityError
+from django.forms import model_to_dict
 from django.template.loader import render_to_string
 
 from usermanagement.constants import UserConstants
@@ -79,3 +80,68 @@ class ForgotPasswordManager:
                 return True
             except Exception as e:
                 raise UserException('Invalid email')
+
+
+class UserAccountManager:
+
+    def __init__(self, email=None):
+        self.user = None
+        if email:
+            try:
+                self.user = CustomUser.objects.get(email=email)
+            except Exception as e:
+                raise UserException('User doesnot exist')
+
+    def get_user_details(self):
+        user = model_to_dict(self.user,
+                             exclude=['id', 'password', 'last_login', 'is_active', 'modified_at'])
+        user['created_at'] = user.pop('created_at').date()
+        full_name = user.get('firstname')
+        if user.get('lastname'):
+            full_name += " " + user.get('lastname')
+        user['full_name'] = full_name
+        return user
+
+    def edit_my_profile(self, payload):
+        firstname = payload.get('firstName', '').strip()
+        lastname = payload.get('lastName', '').strip()
+        phone = payload.get('phone', '').strip()
+        gender = payload.get('gender', '').strip()
+        if firstname:
+            self.user.firstname = firstname
+        if lastname:
+            self.user.lastname = lastname
+        if phone:
+            if not Validators.phone_validator(phone):
+                raise UserException('Invalid Phone Number')
+            self.user.phone = phone
+        if gender:
+            if gender not in UserConstants.GENDER_TYPES:
+                raise UserException('Invalid Gender type')
+            self.user.gender = gender
+        self.user.save()
+
+
+class ResetPasswordManager:
+
+    def __init__(self, email=None):
+        self.user = None
+        try:
+            self.user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist as e:
+            raise UserException('Email doesnot exist')
+
+    def reset_password(self, payload):
+        old_password = payload.get('password').strip()
+        if not old_password:
+            raise UserException('Please provide old password')
+        new_password = payload.get('newPassword').strip()
+        confirm_password = payload.get('confirmPassword').strip()
+        if len(new_password) < 5:
+            raise UserException('Password length must be greater than or equal to 5 char')
+        if new_password != confirm_password:
+            raise UserException('Password doesnot match')
+        if not self.user.check_password(old_password):
+            raise UserException('Invalid Password')
+        self.user.set_password(new_password)
+        self.user.save()

@@ -8,3 +8,8 @@ export const forgotPasswordService = (filters) => {
   todoService.updateTokenAndInstances();
   return todoService.post(Urls.FORGOT_PASSWORD, filters);
 };
+
+export const resetPasswordService = (filters) => {
+  todoService.updateTokenAndInstances();
+  return todoService.post(Urls.RESET_PASSWORD, filters);
+};

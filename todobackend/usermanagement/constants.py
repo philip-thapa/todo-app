@@ -1,5 +1,5 @@
 class UserConstants:
-    GENDER_TYPES = ['M', 'F', 'N']
+    GENDER_TYPES = ['Male', 'Female', 'N/A']
 
     mail_subject = 'Activate your account'
 
