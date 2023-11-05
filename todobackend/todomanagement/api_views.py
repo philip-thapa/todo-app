@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from todomanagement.constants import TodoException
-from todomanagement.todo_manager import CRUDManager
+from todomanagement.todo_manager import CRUDManager, FileManager
 
 
 class AddTodo(APIView):
@@ -25,6 +25,19 @@ class UpdateTodo(APIView):
             payload = request.data
             CRUDManager(payload.get('todoId')).update_todo(payload)
             return Response({'success': True}, 200)
+        except TodoException as e:
+            return Response(str(e), 400)
+        except Exception as e:
+            return Response(str(e), 500)
+
+
+class UploadTodFile(APIView):
+
+    def post(self, request):
+        try:
+            payload = request.data
+            FileManager(payload.get('todoId')).upload_todo_file(request)
+            return Response({'msg': 'success'}, 200)
         except TodoException as e:
             return Response(str(e), 400)
         except Exception as e:

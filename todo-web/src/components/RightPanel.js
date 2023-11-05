@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faTrash, faStar as solidFaStar } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark, faFile, faSun, faStar as regFaStar } from '@fortawesome/free-regular-svg-icons';
 import './RightPanel.css'
-import { addMydayService, updateTodoService } from '../pages/Home/Home.service';
+import { addFileService, addMydayService, updateTodoService } from '../pages/Home/Home.service';
 import useAxios from '../useAxios';
 import CustomSpinner from './Spinner';
 
@@ -15,15 +15,19 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
     }
 
     const [note, setNote] = useState('');
+    const fileInputRef = useRef(null);
+    const [fileSelected, setFileSelected] = useState(null);
     const [updateRes, updateError, updateLoad, updateTodo, setUpdateError] = useAxios();
     const [addMyDayRes, addMyDayError, addMydayLoad, fetchAddMyDay, setAddMyDayError] = useAxios();
+    const [addFileRes, addFileError, addFileLoading, fetchAddFile, setAddFileError] = useAxios();
+
     const errorState = [updateError, addMyDayError];
 
     useEffect(() => {
-       if (updateRes?.success || addMyDayRes?.msg === 'success'){
+       if (updateRes?.success || addMyDayRes?.msg === 'success' || addFileRes?.msg === 'success'){
         handleReload(true)
        }
-    }, [updateRes, addMyDayRes])
+    }, [updateRes, addMyDayRes, addFileRes])
 
     useEffect(() => {
         if(todo?.note){
@@ -58,6 +62,18 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
         }
         fetchAddMyDay(addMydayService(filter))
     }
+
+    const handleFileClick = () => {
+        fileInputRef.current.click();
+      };
+    
+      const handleFileSelect = (event) => {
+        const selectedFile = event.target.files[0];
+        setFileSelected(selectedFile)
+        if (selectedFile)
+        fetchAddFile(addFileService({todoId: todo?.id, todoFile: selectedFile}))
+        setFileSelected('');
+      };
 
     const renderAlerts = errorState.map((error, index) => (
         error && (
@@ -123,7 +139,14 @@ function RightPanel({todo, openModal, handleReload, handleCheck}) {
                     <FontAwesomeIcon icon={faFile} />
                 </Col>
                 <Col xs={10}>
-                    <p className='font-weight-light'>Add file</p>
+                    <input
+                        value={fileSelected}
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleFileSelect}
+                    />
+                    <p className='font-weight-light' onClick={handleFileClick}>Add file</p>
                 </Col>
                 <Col xs={1}>
                 </Col>

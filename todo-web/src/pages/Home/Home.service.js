@@ -33,3 +33,7 @@ export const addMydayService = (filters) => {
   return todoService.get(Urls.ADD_MY_DAY, filters);
 };
 
+export const addFileService = (filters) => {
+  return todoService.multiPartFormData(Urls.ADD_FILE, filters);
+};
+

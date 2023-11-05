@@ -1,8 +1,8 @@
 from django.db.models import Q
 
 from todomanagement.constants import TodoException, Constants
-from todomanagement.models import Todos, Category
-from todomanagement.todo_serializer import TodoSerializer
+from todomanagement.models import Todos, Category, TodoImages
+from todomanagement.todo_serializer import TodoSerializer, TodoImageSerializer
 from utils.date_time import DateTime
 from datetime import datetime, timedelta
 
@@ -125,3 +125,30 @@ class CRUDManager:
         else:
             self.todo.todo_date = DateTime.get_current_date()
         self.todo.save()
+
+
+class FileManager:
+
+    def __init__(self, todo_id=None, file_id=None):
+        self.todo = None
+        self.file = None
+        if todo_id:
+            try:
+                self.todo = Todos.objects.get(id=todo_id)
+            except Exception as e:
+                raise TodoException('Todo doesnot exist')
+        if file_id:
+            try:
+                self.file = TodoImages.objects.get(id=file_id)
+            except Exception as e:
+                raise TodoException('File doesnot exist')
+        else:
+            self.file = TodoImages()
+
+    def upload_todo_file(self, request):
+        payload = request.data
+        # serialized_data = TodoImageSerializer(data=payload.get('todoFile'))
+        self.file.file_path = request.FILES.get('todoFile')
+        self.file.todo = self.todo
+        self.file.created_by = request.user.id
+        self.file.save()

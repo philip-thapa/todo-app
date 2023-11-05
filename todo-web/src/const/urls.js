@@ -18,4 +18,5 @@ export class Urls {
     static UPDATE_TODO = Urls.TODO_API_PREFIX + '/todo/update-todo';
     static DELETE_TODO = Urls.TODO_API_PREFIX + '/todo/delete-todo';
     static ADD_MY_DAY = Urls.TODO_API_PREFIX + '/todo/add-remove-myday-todo';
+    static ADD_FILE = Urls.TODO_API_PREFIX + '/todo/upload-file';
 }

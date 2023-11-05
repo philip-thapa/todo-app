@@ -32,8 +32,10 @@ class Todos(CustomModel):
 
 
 class TodoImages(CustomModel):
-    file_path = models.CharField(db_column="FilePath", max_length=200, null=True, blank=True)
+    file_path = models.FileField(db_column="FilePath", upload_to='files/',  null=True, blank=True)
+    # file_path = models.CharField(db_column="FilePath", max_length=200, null=True, blank=True)
     todo = models.ForeignKey(Todos, db_column='todoId', on_delete=models.CASCADE, related_name='todoimage_todoid')
+    created_by = models.CharField(db_column='createdBy', max_length=16)
 
     class Meta:
         db_table = 'TodoImages'
